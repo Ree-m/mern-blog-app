@@ -6,6 +6,9 @@ const User = require("./models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
+const multer  = require('multer')
+const uploadMiddleware = multer({ dest: 'uploads/' })
+
 // const connectDB = require("../config/database");
 
 
@@ -21,7 +24,7 @@ const salt = bcrypt.genSaltSync(saltRounds)
 const secret = "kj06d8eg4dbklpo3ie3u2x86k047gfbc7ny" //this secret is called a salt!!
 
 
-app.use(cors({credentials:true,origin:'http://localhost:5173'}));
+app.use(cors({ credentials: true, origin: 'http://localhost:5173' }));
 
 app.use(express.json());
 app.use(cookieParser())
@@ -49,14 +52,17 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", async (req, res) => {
     const { username, password } = req.body
-    const userInfo = await User.findOne({ username: username })  //find username that is eqaul to the username typed in
+    const userInfo = await User.findOne({ username})  //find username that is eqaul to the username typed in
     const passOk = bcrypt.compareSync(password, userInfo.password)
 
     if (passOk) {
         // logged in
         jwt.sign({ username, id: userInfo._id }, secret, {}, (err, token) => { //yhis token gets used in /profile
             if (err) throw err
-            res.cookie('token',token).json('ok')
+            res.cookie('token', token).json({
+                id:userInfo._id,
+                username
+            })  //'token' is set to token fro the parameter
         })
     } else {
         // not logged in
@@ -65,13 +71,23 @@ app.post("/login", async (req, res) => {
 
 })
 
-app.get("/profile",(req,res)=>{
-    jwt.verify(req.cookies.token,secret,{},(error,userInfo)=>{
-        if(error) throw error
+app.get("/profile", (req, res) => {
+    jwt.verify(req.cookies.token, secret, {}, (error, userInfo) => {
+        if (error) throw error
         res.json(userInfo)
     })
-    res.json(req.cookies)
 })
+
+app.post("/logout", (req, res) => {
+    res.cookie("token", "").json("ok")  //sets 'token; to empty,ie,invalid,now user can be loged out
+    
+}
+)
+
+app.post("/create",uploadMiddleware.single("file"), (req, res) => {
+res.json(req.file)    
+}
+)
 
 app.listen(4000);
 
