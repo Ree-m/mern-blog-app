@@ -3,11 +3,13 @@ const app = express();
 const cors = require("cors");
 const mongoose = require("mongoose");
 const User = require("./models/User");
+const Post=require("./models/Post")
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken")
 const cookieParser = require("cookie-parser")
 const multer  = require('multer')
 const uploadMiddleware = multer({ dest: 'uploads/' })
+const fs=require("fs")
 
 // const connectDB = require("../config/database");
 
@@ -84,10 +86,32 @@ app.post("/logout", (req, res) => {
 }
 )
 
-app.post("/create",uploadMiddleware.single("file"), (req, res) => {
-res.json(req.file)    
-}
-)
+app.post("/create",uploadMiddleware.single("file"),async (req, res) => {
+const{originalname,path}=req.file
+// In the the uploads folder,i need the images to upload from client side form.
+// For that,the uploaded file (in upload folder) needs the extension,ie,png/jpg/.. etc
+// So i need to grab the extension from req.file.originalname
+
+const splitFileName=originalname.split(".")  //makes an array of two objects,one is the fle name and the other is the extension name 
+const extension=splitFileName[splitFileName.length-1]  //gets onlt the extension
+const newPath=path +"."+ extension
+fs.renameSync(path,newPath)  //the path ofthe image now has an extension and works.ie.its uploaded in the upload folder and is viewable
+// res.json(extension)  like console.log but in network
+
+const newPost=await Post.create({
+    title:req.body.title,
+    summary:req.body.sumamry,
+    content:req.body.content,
+    cover:newPath
+})
+res.json(newPost)
+})
+
+
+app.get("/post",async(req,res)=>{
+   const posts=await Post.find()
+   res.json(posts)
+})
 
 app.listen(4000);
 
