@@ -1,22 +1,30 @@
-const Post = () => {
-    return ( 
-        <div className="post">
+import { format } from "date-fns"
+import { Link } from "react-router-dom";
 
-        <div className="image">
-          <img src="https://techcrunch.com/wp-content/uploads/2020/06/google-maps-ios-icon.jpg?w=990&crop=1" alt="" />
-        </div>
+const Post = ({ _id, title, summary, content, cover, author, createdAt }) => {
+  return (
+    <div className="post">
 
-        <div className="text">
-          <h2>Google Maps launches Immersive View in five cities, will roll out glanceable directions soon</h2>
-          <p className="info">
-            <a href="" className="author">David Paszko</a>
-            <time>2023-01-09</time>
-          </p>
-          <p>Google is launching new updates for Maps that are part of its plan to make the navigation app more immersive and intuitive for users, the company announced today at its event in Paris.</p>
-        </div>
-
+      <div className="image">
+        <Link to={`/post/${_id}`}>
+          <img src={`http://localhost:4000/${cover}`} alt="" />
+        </Link>
       </div>
-     );
+
+      <div className="text">
+        <Link to={`/post/${_id}`}>
+
+          <h2>{title}</h2>
+        </Link>
+        <p className="info">
+          <a href="" className="author">{author.username}</a>
+          <time>{format(new Date(createdAt), 'MMM dd, yyyy k:mm:ss')}</time>
+        </p>
+        <p>{summary}</p>
+      </div>
+
+    </div>
+  );
 }
- 
+
 export default Post;

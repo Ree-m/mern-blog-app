@@ -6,14 +6,20 @@ const RegisterPage = () => {
 
     async function register(e) {
         e.preventDefault()
-        await fetch('http://localhost:4000/register',{
-            method:'POST',
-            body:JSON.stringify({username,password}),
-            headers:{
+        const response = await fetch('http://localhost:4000/register', {
+            method: 'POST',
+            body: JSON.stringify({ username, password }),
+            headers: {
                 'Content-Type': 'application/json',
             }
-        
+
         })
+        if (response.ok) { //if resposne.ok is true
+            console.log(response)
+            alert("Registeration succesful.")
+        } else {
+            alert("Registeration failed.")
+        }
 
     }
     return (
@@ -24,7 +30,7 @@ const RegisterPage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)} />
 
-            <input type="text"
+            <input type="password"
                 placeholder="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)} />
