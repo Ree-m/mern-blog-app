@@ -26,7 +26,7 @@ const Header = () => {
 const username =userInfo?.username
   return (
     <header>
-    <Link to="/" className="logo">MyBlog</Link>
+    <Link to="/" className="logo">MyBlog haha</Link>
     <nav>
       {username && (
         <>
